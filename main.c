@@ -12,13 +12,13 @@ char level[] = " .-=coaA@#";
 float grid[HEIGHT][WIDTH] = {0};
 float grid_diff[HEIGHT][WIDTH] = {0};
 float ra = 11;
-float alpha = 0.028;
-// float alpha = 0.147;
+float alpha_n = 0.028;
+float alpha_m = 0.147;
 float b1 = 0.278;
 float b2 = 0.365;
 float d1 = 0.267;
 float d2 = 0.445;
-float dt = 0.03f;
+float dt = 0.05f;
 
 float rand_float(void) { return (float)rand() / (float)RAND_MAX; }
 
@@ -48,20 +48,20 @@ void display_grid(float grid[HEIGHT][WIDTH]) {
 
 int emod(int a, int b) { return (a % b + b) % b; }
 
-float sigma1(float x, float a) {
+float sigma(float x, float a, float alpha) {
   return 1.0f / (1.0f + expf(-(x - a) * 4 / alpha));
 }
 
-float sigma2(float x, float a, float b) {
-  return sigma1(x, a) * (1 - sigma1(x, b));
+float sigma_n(float x, float a, float b) {
+  return sigma(x, a, alpha_n) * (1 - sigma(x, b, alpha_n));
 }
 
-float sigmam(float x, float y, float m) {
-  return x * (1 - sigma1(m, 0.5f)) + y * sigma1(m, 0.5f);
+float sigma_m(float x, float y, float m) {
+  return x * (1 - sigma(m, 0.5f, alpha_m)) + y * sigma(m, 0.5f, alpha_m);
 }
 
 float s(float n, float m) {
-  return sigma2(n, sigmam(b1, d1, m), sigmam(b2, d2, m));
+  return sigma_n(n, sigma_m(b1, d1, m), sigma_m(b2, d2, m));
 }
 
 void compute_grid_diff(void) {
